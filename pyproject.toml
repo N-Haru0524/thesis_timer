@@ -1,0 +1,12 @@
+[project]
+name = "thesis-timer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datetime>=6.0",
+    "pyside6>=6.10.1",
+    "pywebview>=6.1",
+    "rich>=14.2.0",
+]
