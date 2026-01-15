@@ -9,4 +9,5 @@ dependencies = [
     "pyside6>=6.10.1",
     "pywebview>=6.1",
     "rich>=14.2.0",
+    "tzdata>=2025.3",
 ]

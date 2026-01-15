@@ -1,10 +1,10 @@
 import webview
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from timer import ThesisTimer
 import time
 
-JST = timezone(timedelta(hours=9))
+JST = ZoneInfo("Asia/Tokyo")
 class Api:
     def __init__(self):
         self.bachelor_timer = ThesisTimer(
