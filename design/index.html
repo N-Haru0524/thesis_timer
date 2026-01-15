@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TIMER</title>
+    <link rel="stylesheet" type="text/css" href="reset.css" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
+    <div class="timer">
+      <div class="limit-info">
+        <span class="display-area">提出締切まで</span>
+        <span class="active-time-remaining display-area"
+          >ACTIVE TIME REMAINING:</span
+        >
+        <span></span>
+      </div>
+      <div class="remain">
+        <span class="display-area">あと</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="time display-area">
+        <span class="hour-area">
+          <span id="hour">0000</span>
+          <span class="unit">h</span>
+        </span>
+        <span class="minute-second-area">
+          <span id="minute">00</span>:<span id="second">00</span
+          ><span class="millisecond-area"
+            >:<span id="millisecond">00</span></span
+          >
+        </span>
+      </div>
+      <div class="energy display-area">
+        <button id="bachelor-button" class="energy-item disabled">
+          <div class="power-system">
+            <div>卒論</div>
+            <div>B A C H E L O R</div>
+            <div></div>
+          </div>
+        </button>
+        <div class="energy-item">
+          <div class="power-supply">
+            <div>主電源供給システム</div>
+            <div>MAIN ENERGY SUPPLY SYSTEM</div>
+          </div>
+        </div>
+        <button id="master-button" class="energy-item">
+          <div class="power-system">
+            <div>修論</div>
+            <div>M A S T E R</div>
+            <div></div>
+          </div>
+        </button>
+      </div>
+      <div class="control">
+        <button id="remain-button" class="active-control display-area">
+          <div>R E M A I N</div>
+          <div></div>
+        </button>
+        <button id="abs-button" class="display-area">
+          <div>A B S O L U T E</div>
+          <div></div>
+        </button>
+        <button id="stop-button" class="display-area">
+          <div>S T O P</div>
+          <div></div>
+        </button>
+        <button id="start-button" class="active-control display-area">
+          <div>S T A R T</div>
+          <div></div>
+        </button>
+      </div>
+      <div class="black-area danger-emargency"></div>
+      <div class="black-area brank-area"></div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>

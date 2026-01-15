@@ -34,7 +34,7 @@ def main():
 
     webview.create_window(
         "EVA THESIS TIMER",
-        "ui/index.html",
+        "design/index.html",
         fullscreen=True,
         js_api=api
     )
