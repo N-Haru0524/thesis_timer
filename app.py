@@ -1,16 +1,17 @@
 import webview
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 from timer import ThesisTimer
 import time
 
-
+JST = timezone(timedelta(hours=9))
 class Api:
     def __init__(self):
         self.bachelor_timer = ThesisTimer(
-            datetime(2026, 2, 10, 12, 0, tzinfo=timezone.utc)
+            datetime(2026, 2, 10, 12, 0, tzinfo=JST)
         )
         self.master_timer = ThesisTimer(
-            datetime(2026, 2, 2, 12, 0, tzinfo=timezone.utc)
+            datetime(2026, 2, 2, 12, 0, tzinfo=JST)
         )
 
     def get_base_status(self, timemode):
