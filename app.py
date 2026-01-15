@@ -7,10 +7,10 @@ import time
 class Api:
     def __init__(self):
         self.bachelor_timer = ThesisTimer(
-            datetime(2026, 1, 31, 17, 0, tzinfo=timezone.utc)
+            datetime(2026, 2, 10, 12, 0, tzinfo=timezone.utc)
         )
         self.master_timer = ThesisTimer(
-            datetime(2026, 2, 10, 17, 0, tzinfo=timezone.utc)
+            datetime(2026, 2, 2, 12, 0, tzinfo=timezone.utc)
         )
 
     def get_base_status(self, timemode):
@@ -39,7 +39,7 @@ def main():
         js_api=api
     )
 
-    webview.start(debug=True)
+    webview.start(debug=False)
 
 
 if __name__ == "__main__":
