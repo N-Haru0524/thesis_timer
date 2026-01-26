@@ -11,7 +11,7 @@ class Api:
             datetime(2026, 2, 10, 12, 0, tzinfo=JST)
         )
         self.master_timer = ThesisTimer(
-            datetime(2026, 2, 2, 12, 0, tzinfo=JST)
+            datetime(2026, 2, 2, 15, 0, tzinfo=JST)
         )
 
     def get_base_status(self, timemode):
