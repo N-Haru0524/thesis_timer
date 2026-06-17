@@ -1,8 +1,8 @@
 // ===== 締切設定（JST = UTC+9）=====
 // もともと Python (timer.py / app.py) がやっていた計算をブラウザだけで完結させる。
 const DEADLINES = {
-  bachelor: "2026-02-10T12:00:00+09:00", // 卒論
-  master: "2026-02-02T15:00:00+09:00", // 修論
+  bachelor: "2027-02-10T12:00:00+09:00", // 卒論
+  master: "2027-02-02T15:00:00+09:00", // 修論
 };
 const WARN_HOURS = 168.0; // 7日
 const DANGER_HOURS = 72.0; // 3日
