@@ -1,50 +1,61 @@
-let baseSeconds = 0;
-let baseTime = 0;      // UNIX時刻（秒）
+// ===== 締切設定（JST = UTC+9）=====
+// もともと Python (timer.py / app.py) がやっていた計算をブラウザだけで完結させる。
+const DEADLINES = {
+  bachelor: "2026-02-10T12:00:00+09:00", // 卒論
+  master: "2026-02-02T15:00:00+09:00", // 修論
+};
+const WARN_HOURS = 168.0; // 7日
+const DANGER_HOURS = 72.0; // 3日
+
+// ===== 状態 =====
 let status = "safe";
 let overdue = false;
-let running = true;        // START / STOP
-let displaymode = "remain";      // "remain" | "absolute"
-let timemode = "master";         // "master" | "bachelor"
-let deadlineISO = null;   // ABSOLUTE 表示用
+let running = true; // START / STOP
+let displaymode = "remain"; // "remain" | "absolute"
+let timemode = "master"; // "master" | "bachelor"
 
-// sync data from Python backend
-async function syncFromPython() {
-  try {
-    const data = await window.pywebview.api.get_base_status(timemode);
+// 締切までの残り秒数と状態を計算（timer.py の移植）
+function computeState(mode) {
+  const deadline = new Date(DEADLINES[mode]);
+  const remainSeconds = (deadline.getTime() - Date.now()) / 1000;
+  const isOverdue = remainSeconds < 0;
 
-    if (data.overdue) {
-      overdue = true;
-      document.body.classList.add("danger");
-      return;
-    }
-
-    overdue = false;
-    baseSeconds = data.base_seconds;
-    baseTime = data.base_time;
-    status = data.status;
-    deadlineISO = data.deadline;
-
-    document.body.classList.remove("safe", "warn", "danger");
-    document.body.classList.add(status);
-
-  } catch (e) {
-    console.error("sync error:", e);
+  let st;
+  if (isOverdue) {
+    st = "danger";
+  } else {
+    const hours = remainSeconds / 3600;
+    if (hours < DANGER_HOURS) st = "danger";
+    else if (hours < WARN_HOURS) st = "warn";
+    else st = "safe";
   }
+
+  return { remainSeconds, overdue: isOverdue, status: st };
 }
 
-// UI control handlers
+// 1秒ごとに状態（safe/warn/danger・overdue）を更新
+function syncState() {
+  const s = computeState(timemode);
+  overdue = s.overdue;
+  status = s.status;
+
+  document.body.classList.remove("safe", "warn", "danger");
+  document.body.classList.add(overdue ? "danger" : status);
+}
+
+// ===== UI control handlers =====
 const displayButtons = ["remain-button", "abs-button"];
 const runButtons = ["start-button", "stop-button"];
-const timeModeButtons = ["bachelor-button", "master-button"];
 
 const unit = document.querySelector(".hour-area span:last-child");
 
 function setActiveInGroup(buttonIds, activeId) {
-  buttonIds.forEach(id => {
+  buttonIds.forEach((id) => {
     document.getElementById(id).classList.remove("active-control");
   });
   document.getElementById(activeId).classList.add("active-control");
 }
+
 function setEnergyMode(mode) {
   const bachelor = document.getElementById("bachelor-button");
   const master = document.getElementById("master-button");
@@ -58,7 +69,7 @@ function setEnergyMode(mode) {
   }
 
   timemode = mode;
-  syncFromPython();
+  syncState();
 }
 
 // button event handlers
@@ -91,9 +102,9 @@ document.getElementById("master-button").onclick = () => {
   }
 };
 
-// display update loop
+// ===== display update loop =====
 function updateDisplay() {
-  if (!running || overdue) return;
+  if (!running) return;
 
   if (displaymode === "remain") {
     renderRemain();
@@ -101,10 +112,9 @@ function updateDisplay() {
     renderAbsolute();
   }
 }
+
 function renderRemain() {
-  const now = Date.now() / 1000;
-  const elapsed = now - baseTime;
-  const remain = Math.max(0, baseSeconds - elapsed);
+  const remain = Math.max(0, computeState(timemode).remainSeconds);
 
   const totalCs = Math.floor(remain * 100);
 
@@ -113,48 +123,33 @@ function renderRemain() {
   const seconds = Math.floor((totalCs % 6000) / 100);
   const centisec = totalCs % 100;
 
-  document.getElementById("hour").textContent =
-    String(hours).padStart(4, "0");
-  document.getElementById("minute").textContent =
-    String(minutes).padStart(2, "0");
-  document.getElementById("second").textContent =
-    String(seconds).padStart(2, "0");
-  document.getElementById("millisecond").textContent =
-    String(centisec).padStart(2, "0");
+  document.getElementById("hour").textContent = String(hours).padStart(4, "0");
+  document.getElementById("minute").textContent = String(minutes).padStart(2, "0");
+  document.getElementById("second").textContent = String(seconds).padStart(2, "0");
+  document.getElementById("millisecond").textContent = String(centisec).padStart(2, "0");
 }
+
 function renderAbsolute() {
-  if (!deadlineISO) return;
+  // 締切時刻を JST で表示（閲覧者のタイムゾーンに依存しない）
+  const d = new Date(DEADLINES[timemode]);
+  const jst = new Date(d.getTime() + 9 * 3600 * 1000);
 
-  const d = new Date(deadlineISO);
-
-  document.getElementById("hour").textContent =
-    String(d.getFullYear()).padStart(4, "0");
-
-  document.getElementById("minute").textContent =
-    String(d.getMonth() + 1).padStart(2, "0");
-
-  document.getElementById("second").textContent =
-    String(d.getDate()).padStart(2, "0");
-
-  document.getElementById("millisecond").textContent =
-    String(d.getHours()).padStart(2, "0");
+  document.getElementById("hour").textContent = String(jst.getUTCFullYear()).padStart(4, "0");
+  document.getElementById("minute").textContent = String(jst.getUTCMonth() + 1).padStart(2, "0");
+  document.getElementById("second").textContent = String(jst.getUTCDate()).padStart(2, "0");
+  document.getElementById("millisecond").textContent = String(jst.getUTCHours()).padStart(2, "0");
 }
 
-// Escape key to exit app
-document.addEventListener("DOMContentLoaded", () => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      if (window.pywebview?.api?.exit_app) {
-        window.pywebview.api.exit_app();
-      } else {
-        console.warn("pywebview api not ready");
-      }
-    }
-  });
-
+// Escape / クリックで全画面の出入り（ブラウザ版はアプリ終了の代わり）
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.fullscreenElement) {
+    document.exitFullscreen?.();
+  } else if (e.key === "Enter" && !document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  }
 });
 
 // activate sync and update loops
-syncFromPython();
-setInterval(syncFromPython, 1000);
+syncState();
+setInterval(syncState, 1000);
 setInterval(updateDisplay, 10);
